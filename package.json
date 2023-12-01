@@ -4,11 +4,18 @@
   "description": "It is Student Management System Project for Task of Sciqus Infotech",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js && npm run open-login",
+    "open-login": "open http://localhost:3000/login",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Prashant Hatekar",
   "license": "ISC",
   "dependencies": {
+    "body-parser": "^1.20.2",
+    "express": "^4.18.2",
     "mysql2": "^3.6.5"
+  },
+  "devDependencies": {
+    "open": "^9.1.0"
   }
 }
