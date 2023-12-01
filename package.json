@@ -4,8 +4,12 @@
   "description": "It is Student Management System Project for Task of Sciqus Infotech",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Prashant Hatekar",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "mysql2": "^3.6.5"
+  }
 }
