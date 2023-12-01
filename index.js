@@ -64,6 +64,7 @@ app.post('/check-userNameAvailability', async (req, res) => {
   }
 });
 
+
 async function checkUserNameAvailability(username) {
   const [rows] = await database.query('SELECT * FROM students WHERE username = ?', [username]);
   return rows;
