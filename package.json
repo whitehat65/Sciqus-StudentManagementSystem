@@ -1,0 +1,11 @@
+{
+  "name": "student_management_system",
+  "version": "1.0.0",
+  "description": "It is Student Management System Project for Task of Sciqus Infotech",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Prashant Hatekar",
+  "license": "ISC"
+}
