@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Student Management System</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="text-center">Register</h2>
+            </div>
+            <div class="card-body">
+                <form action="/register" method="post" id="registrationForm">
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" name="email" class="form-control" placeholder="Enter your Email">
+                            <span id="email-available" class="availability-message"></span>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="username">Username</label>
+                            <input type="text" name="username" id="username" class="form-control" placeholder="Enter your Username or Email">
+                            <span id="username-available" class="availability-message"></span>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" name="password" class="form-control" placeholder="Enter your Password">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="fname">First Name</label>
+                            <input type="text" class="form-control" id="fname" name="fname" placeholder="Enter your First Name">
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="lname">Last Name</label>
+                            <input type="text" class="form-control" id="lname" name="lname" placeholder="Enter your Last Name">
+                        </div>
+                    </div>
+            
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="mobile">Mobile Number</label>
+                            <input type="text" class="form-control" id="mobile" name="mobile" placeholder="Enter your Mobile Number">
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="dob">Date of Birth</label>
+                            <input type="date" class="form-control" id="dob" name="dob">
+                        </div>
+                    </div>
+            
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="gender">Gender</label>
+                            <select class="form-control" id="gender" name="gender">
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="address">Address</label>
+                            <input type="text" class="form-control" id="address" name="address" placeholder="Enter your Address">
+                        </div>
+                    </div>
+            
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="country">Country</label>
+                            <input type="text" class="form-control" id="country" name="country" placeholder="Enter your Country">
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="education">Education</label>
+                            <input type="text" class="form-control" id="education" name="education" placeholder="Enter your Education">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col text-left">
+                            <button type="submit" class="btn btn-primary" id="registerBtn">Register</button>
+                        </div>
+                        <div class="col text-right">
+                            <a href="/login" class="btn btn-primary">Login</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        $(document).ready(function(){
+            $('#email').on('blur',function(){
+                var emailAvailabilityMessage=$('#email-available');
+                var email=$('#email').val();
+                if(email!=""){
+                    $.ajax({
+                        url:"/check-emailAvailability",
+                        method:"post",
+                        data:{
+                            "email":email
+                        },
+                        success:function (result){
+                            //console.log(result);
+                            //console.log(result.message);
+                            if(result.status==200){
+                                emailAvailabilityMessage.text(result.message).css('color','green');
+                            }
+                            else{
+                                emailAvailabilityMessage.text(result.message).css('color','red');
+                            }
+                            
+                        }
+                    });
+                }
+            });
+            $('#username').on('blur',function(){
+                var userNameAvailabilityMessage=$('#username-available');
+                var username=$('#username').val();
+                if(username!=""){
+                    $.ajax({
+                        url:"/check-userNameAvailability",
+                        method:"post",
+                        data:{
+                            "username":username
+                        },
+                        success:function (result){
+                            //console.log(result);
+                            //console.log(result.message);
+                            if(result.status==200){
+                                userNameAvailabilityMessage.text(result.message).css('color','green');
+                            }
+                            else {
+                                userNameAvailabilityMessage.text(result.message).css('color','red');
+                            }
+                            
+                        }
+                    });
+                }
+            });
+            
+            function isValidateMobile(mobile) {
+                const mobileRegex = /^[0-9]{10}$/;
+                return mobileRegex.test(mobile);
+            }
+        
+            
+            function isValidateDOB(dob) {
+                //console.log(dob);
+                if (dob === '') {
+                    return false;
+                }
+                //const enteredDob=new Date(dob);
+                //const today=new Date();
+                //console.log(today);
+                //return enteredDate <= today;
+            }
+
+            $('#registrationForm').on('submit', function(event) {
+                const mobile = $('#mobile').val();
+                const dob = $('#dob').val();
+
+                if (!isValidateMobile(mobile)) {
+                    alert('Please enter a valid 10-digit mobile number.');
+                    event.preventDefault(); // Prevent form submission
+                    return;
+                }
+            
+               
+                if (!isValidateDOB(dob)) {
+                  alert('Please enter a valid date of birth.');
+                  event.preventDefault(); // Prevent form submission
+                  return;
+                }
+
+                if ($('#email-available').text() !== 'Email is available') {
+                    event.preventDefault();
+                    alert('Please change your email');
+                }
+                if($('#username-available').text() !== 'Username is available'){
+                    event.preventDefault();
+                    alert('Please change your Username');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
