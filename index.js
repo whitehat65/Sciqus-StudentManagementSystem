@@ -3,6 +3,7 @@ const database = require('./config/dbConnection');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const path = require('path');
+const router =express.Router();
 
 const app = express();
 const port = 3000;
@@ -170,6 +171,26 @@ app.post('/login', async (req, res) => {
 app.get('/adminDashboard', (req, res) => {
   res.render('adminDashboard', { user: req.session.user });
 });
+
+
+//route for view student
+app.get('/viewStudents', (req, res) => {
+  res.render('viewStudents', { user: req.session.user });
+});
+
+
+//route for fetch all records of student
+app.get('/fetchAllStudents', async (req, res) => {
+  try {
+      
+      const [rows, fields] = await database.query('SELECT * FROM students where is_admin=0');
+      res.json({ data: rows });
+  } catch (error) {
+      console.error('Error fetching students:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 
 // Route for the user dashboard
 app.get('/userDashboard', (req, res) => {
