@@ -1,14 +1,26 @@
 const express = require('express');
 const database = require('./config/dbConnection');
 const bodyParser = require('body-parser');
+const session = require('express-session');
+const path = require('path');
 
 const app = express();
 const port = 3000;
+
+app.set('view engine', 'ejs');
+
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.use((req, res, next) => {
   req.database = database;
   next();
 });
+
+app.use(session({
+  secret: '1234',
+  resave: false,
+  saveUninitialized: true,
+}));
 
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(express.static('views'));
@@ -30,7 +42,7 @@ app.post('/check-emailAvailability', async (req, res) => {
   try {
     const result = await checkEmailAvailability(email);
 
-    if (result.length === 0) {
+    if (result.length === 0) { 
       return res.status(200).json({ status:200,message: 'Email is available' });
     } else {
       return res.status(209).json({ status:209,message: `${email} already exists` });
@@ -106,6 +118,62 @@ app.post('/register',async (req,res)=>{
     res.status(500).json({ error: 'Internal Server Error' });
   }
   
+});
+
+// routes for login post method
+app.post('/login', async (req, res) => {
+  const formData = req.body;
+  let userName = formData.username;
+  let password = formData.password;
+
+  if (!userName || !password) {
+    res.sendStatus(401);
+  } else {
+    var sql = `SELECT * FROM students WHERE username='${userName}' OR email='${userName}' AND password='${password}';`;
+
+    try {
+      const result = await database.query(sql);
+
+      if (result.length > 0) {
+        const user = result[0];
+        console.log(user);
+
+        req.session.user = {
+          userId: user[0].id,
+          username: user[0].username,
+          fname:user[0].fname,
+          lname:user[0].lname,
+          email: user[0].email,
+          is_admin: user[0].is_admin,
+        };
+        const role=user[0].is_admin;
+        // console.log(role); 
+        if(role==1){
+          // res.send('Admin Login successful'); 
+          res.render('adminDashboard',{user:req.session.user});
+        }else{
+          // res.send('User Login successful'); 
+          res.render('userDashboard',{user:req.session.user});
+        }
+      } else {
+        res.status(401).send('Invalid username or password');
+      }
+    } catch (error) {
+      console.error('Error executing SQL query:', error);
+      res.sendStatus(500);
+    }
+  }
+});
+
+
+//route for admin dashboard
+app.get('/adminDashboard', (req, res) => {
+  res.render('adminDashboard', { user: req.session.user });
+});
+
+// Route for the user dashboard
+app.get('/userDashboard', (req, res) => {
+  res.render('userDashboard', { user: req.session.user });
 });
 
 app.listen(port, () => {
