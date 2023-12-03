@@ -137,7 +137,7 @@ app.post('/login', async (req, res) => {
 
       if (result.length > 0) {
         const user = result[0];
-        console.log(user);
+        //console.log(user);
 
         req.session.user = {
           userId: user[0].id,
@@ -175,7 +175,13 @@ app.get('/adminDashboard', (req, res) => {
 
 //route for view student
 app.get('/viewStudents', (req, res) => {
-  res.render('viewStudents', { user: req.session.user });
+  const successMessage = req.session.successMessage;
+  const errorMessage = req.session.errorMessage;
+
+  req.session.successMessage = null;
+  req.session.errorMessage = null;
+
+  res.render('viewStudents', { user: req.session.user, successMessage, errorMessage });
 });
 
 
@@ -191,6 +197,84 @@ app.get('/fetchAllStudents', async (req, res) => {
   }
 });
 
+//route for fetch student details on their id
+app.get('/fetchStudentDetails/:id',async(req,res)=>{
+    const id=req.params.id;
+
+    try {
+      const details = await fetchStudentDetailsById(id);
+      res.json(details);
+  } catch (error) {
+      console.error('Error fetching student details:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+async function fetchStudentDetailsById(id){
+  try { 
+      const [row, fields] = await database.query('SELECT * FROM students where id= ?',[id]);
+      return { data: row };
+  } catch (error) {
+      console.error('Error fetching students:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+  }
+}
+
+
+// route for update student
+app.post('/updateStudent',async(req,res)=>{
+  //console.log("called");
+  //const details=req.body;
+  const { id } = req.body;
+  //console.log(details);
+    const data = {
+      fname: req.body.fname,
+      lname: req.body.lname,
+      mobile: req.body.mobile,
+      dob: req.body.dob,
+      address: req.body.address,
+      country: req.body.country,
+      education: req.body.education,
+      percentage: req.body.percentage
+  };
+  try {
+
+    await updateStudents(id, data);
+    req.session.successMessage = 'Student Updated Successfully';
+    res.redirect('/viewStudents');
+  } catch (error) {
+    console.error('Error updating student record:', error);
+    req.session.errorMessage = 'Error updating student record';
+    res.redirect('/viewStudents');
+  }
+});
+
+async function updateStudents(id,data){
+  try {
+      const query = `
+          UPDATE students
+          SET fname=?, lname=?, mobile=?, dob=?, address=?, country=?, education=?, percentage=?
+          WHERE id=?
+      `;
+
+      const values = [
+        data.fname,
+        data.lname,
+        data.mobile,
+        data.dob,
+        data.address,
+        data.country,
+        data.education,
+        data.percentage,
+        id
+      ];
+
+      await database.query(query, values);
+  } catch (error) {
+      console.error('Error updating student details:', error);
+      throw error;
+  }
+}
 
 // Route for the user dashboard
 app.get('/userDashboard', (req, res) => {

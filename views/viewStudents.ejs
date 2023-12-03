@@ -293,6 +293,17 @@
                 <div class="container-fluid">
                     <!-- Page Heading -->
                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                        <% if (successMessage) { %>
+                            <div class="alert alert-success">
+                              <%= successMessage %>
+                            </div>
+                          <% } %>
+                        
+                          <% if (errorMessage) { %>
+                            <div class="alert alert-danger">
+                              <%= errorMessage %>
+                            </div>
+                          <% } %>
                         <h1 class="h3 mb-0 text-gray-800 text-center">View Student</h1>
                     </div>
                     <div class="container mt-5">
@@ -358,6 +369,66 @@
             </div>
         </div>
     </div>
+    <div class="modal" id="updateModal" tabindex="-1" role="dialog" aria-labelledby="updateModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="updateModalLabel">Update Student Record</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    
+                    <form action="/updateStudent" method="post" id="updateForm">
+                        <div class="form-group">
+                            <label for="email">Username</label>
+                            <input type="text" class="form-control" id="username" name="username" disabled>
+                        </div>
+                        <input type="text" name="id" id="Id" style="display:none">
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="text" class="form-control" id="email" name="email" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label for="">First Name</label>
+                            <input type="text" class="form-control" id="fname" name="fname">
+                        </div>
+                        <div class="form-group">
+                            <label for="">Last Name</label>
+                            <input type="text" class="form-control" id="lname" name="lname">
+                        </div>
+                        <div class="form-group">
+                            <label for="">Mobile</label>
+                            <input type="text" class="form-control" id="mobile" name="mobile">
+                        </div>
+                        <div class="form-group">
+                            <label for="">Date Of Birth</label>
+                            <input type="date" class="form-control" id="dob" name="dob">
+                        </div>
+                        <div class="form-group">
+                            <label for="">Address</label>
+                            <input type="text" class="form-control" id="address" name="address">
+                        </div>
+                        <div class="form-group">
+                            <label for="">Country</label>
+                            <input type="text" class="form-control" id="country" name="country">
+                        </div>
+                        <div class="form-group">
+                            <label for="">Eduaction</label>
+                            <input type="text" class="form-control" id="education" name="education">
+                        </div>
+                        <div class="form-group">
+                            <label for="">Percentage</label>
+                            <input type="text" class="form-control" id="percentage" name="percentage">
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">Update</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
 
     
@@ -409,6 +480,42 @@
             });
         });
     </script>
+
+    <script>
+        $(document).ready(function(){
+            $(document).on('click', '.update-button', function(){
+                var studentId = $(this).attr('id').split('_')[1];
+                $.ajax({
+                    url: '/fetchStudentDetails/' + studentId,
+                    method: 'GET',
+                    dataType: 'json',
+                    success: function(response) {
+                        console.log(response.data);
+                        var student=response.data[0];
+                        $("#username").val(student.username);
+                        $("#Id").val(student.id);
+                        $('#email').val(student.email);
+                        $('#fname').val(student.fname);
+                        $('#lname').val(student.lname);
+                        $('#mobile').val(student.mobile);
+                        $('#dob').val(student.dob);
+                        $('#address').val(student.address);
+                        $('#country').val(student.country);
+                        $('#education').val(student.education);
+                        $('#percentage').val(student.percentage);
+
+                        $('.modal-title').text("Update Student");
+                        $('#updateModal').modal('show');
+                        
+                    },
+                    error: function(error) {
+                        console.error('Error fetching student details:', error);
+                    }
+                });
+            });
+        })
+    </script>
+
     <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
     <!-- Core plugin JavaScript-->
