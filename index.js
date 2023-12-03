@@ -169,6 +169,9 @@ app.post('/login', async (req, res) => {
 
 //route for admin dashboard
 app.get('/adminDashboard', (req, res) => {
+  if(!req.session.user){
+    return res.redirect('/login');
+  }
   const successMessage = req.session.successMessage;
   const errorMessage = req.session.errorMessage;
 
@@ -221,6 +224,9 @@ app.post('/registerUser',async (req,res)=>{
 
 //route for view student
 app.get('/viewStudents', (req, res) => {
+  if(!req.session.user){
+    return res.redirect('/login');
+  }
   const successMessage = req.session.successMessage;
   const errorMessage = req.session.errorMessage;
 
