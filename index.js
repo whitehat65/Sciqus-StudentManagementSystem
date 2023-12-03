@@ -169,9 +169,55 @@ app.post('/login', async (req, res) => {
 
 //route for admin dashboard
 app.get('/adminDashboard', (req, res) => {
-  res.render('adminDashboard', { user: req.session.user });
+  const successMessage = req.session.successMessage;
+  const errorMessage = req.session.errorMessage;
+
+  req.session.successMessage = null;
+  req.session.errorMessage = null;
+
+  res.render('adminDashboard', { user: req.session.user, successMessage, errorMessage });
 });
 
+// route for  admin adding user 
+app.post('/registerUser',async (req,res)=>{
+  console.log('registration method from index.js called');
+  const formData=req.body;
+  // console.log(formData);
+  try {
+    const formData = req.body;
+
+    // Insert the formData into the "students" table
+    const sql = `
+      INSERT INTO students (email, username, password, fname, lname, mobile, dob, gender, address, country, education)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+    const values = [
+      formData.email,
+      formData.username,
+      formData.password,
+      formData.fname,
+      formData.lname,
+      formData.mobile,
+      formData.dob,
+      formData.gender,
+      formData.address,
+      formData.country,
+      formData.education,
+    ];
+
+    await database.query(sql, values);
+
+    req.session.successMessage = 'Registration successful!';
+
+    res.redirect('/adminDashboard');
+  } catch (error) {
+    console.error('Error during registration:', error);
+    req.session.errorMessage = 'Internal Server Error';
+
+    res.redirect('/adminDashboard');
+  }
+  
+});
 
 //route for view student
 app.get('/viewStudents', (req, res) => {
@@ -275,6 +321,42 @@ async function updateStudents(id,data){
       throw error;
   }
 }
+
+// Route for the delete student
+app.get('/deleteStudent/:id', async (req, res)=>{
+  const { id } = req.params;
+  //console.log(id);
+  if(!id || isNaN(Number(id))){
+    return res.status(401).json({message:'Invalid ID'})
+    }
+    try{
+      let result = await deleteStudent(id);
+    
+      if(result.affectedRows > 0){
+        req.session.successMessage = "Successfully deleted Student";
+        res.redirect('/viewStudents');
+      }else{
+        req.session.errorMessage = "Failed to Delete Student"
+        res.redirect('/viewStudents');
+      }
+    }catch(err){
+      console.log(err);
+      res.send("Something went wrong!");
+    }
+});
+
+async function deleteStudent(id) {
+  try {
+    const query = 'DELETE FROM students WHERE id=?';
+    const value = [id];
+    return database.query(query, value);
+  } catch (error) {
+    console.error('Error deleting student:', error);
+    throw error;
+  }
+}
+
+
 
 // Route for the user dashboard
 app.get('/userDashboard', (req, res) => {
